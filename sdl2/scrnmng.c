@@ -14,6 +14,32 @@ static SDL_Renderer *s_renderer;
 static SDL_Texture *s_texture;
 static SDL_Surface *s_surface;
 static int s_scrnscale = 2;
+static int s_logicalw = 640;
+static int s_logicalh = 400;
+
+static SDL_HitTestResult SDLCALL scrnmng_hittest(
+		SDL_Window *win, const SDL_Point *pt, void *data) {
+
+	int lx, ly;
+
+	(void)win;
+	(void)data;
+
+	lx = pt->x / s_scrnscale;
+	ly = pt->y / s_scrnscale;
+
+	/* title bar: ~22 logical pixels tall */
+	/* MENU_FBORDER(2)+MENU_BORDER(1)+MENUSYS_BCAPTION(1)+MENUSYS_CYCAPTION(18) */
+	if (ly < 22) {
+		/* close button is top-right ~20px from edge - let clicks through */
+		if (lx > s_logicalw - 22) {
+			return SDL_HITTEST_NORMAL;
+		}
+		return SDL_HITTEST_DRAGGABLE;
+	}
+
+	return SDL_HITTEST_NORMAL;
+}
 
 typedef struct {
 	BOOL		enable;
@@ -83,7 +109,10 @@ BRESULT scrnmng_create(int width, int height) {
 		fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
 		return(FAILURE);
 	}
-	s_sdlWindow = SDL_CreateWindow(app_name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * s_scrnscale, height * s_scrnscale, SDL_WINDOW_RESIZABLE);
+	s_logicalw = width;
+	s_logicalh = height;
+	s_sdlWindow = SDL_CreateWindow(app_name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * s_scrnscale, height * s_scrnscale, SDL_WINDOW_BORDERLESS);
+	SDL_SetWindowHitTest(s_sdlWindow, scrnmng_hittest, NULL);
 	s_renderer = SDL_CreateRenderer(s_sdlWindow, -1, 0);
 	SDL_RenderSetLogicalSize(s_renderer, width, height);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
