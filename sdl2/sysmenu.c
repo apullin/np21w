@@ -151,6 +151,18 @@ static void sys_cmd(MENUID id) {
 											(char *)mstr_scropt, dlgscr_cmd);
 			break;
 
+		case MID_SCRN1X:
+			scrnmng_setscale(1);
+			break;
+
+		case MID_SCRN2X:
+			scrnmng_setscale(2);
+			break;
+
+		case MID_SCRN3X:
+			scrnmng_setscale(3);
+			break;
+
 		case MID_KEY:
 			np2cfg.KEY_MODE = 0;
 			keystat_resetjoykey();

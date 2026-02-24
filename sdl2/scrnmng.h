@@ -53,6 +53,7 @@ extern	SCRNSTAT	scrnstat;
 void scrnmng_initialize(void);
 BRESULT scrnmng_create(int width, int height);
 void scrnmng_destroy(void);
+void scrnmng_setscale(int scale);
 
 
 // ---- for menubase

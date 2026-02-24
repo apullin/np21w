@@ -13,6 +13,7 @@ static SDL_Window *s_sdlWindow;
 static SDL_Renderer *s_renderer;
 static SDL_Texture *s_texture;
 static SDL_Surface *s_surface;
+static int s_scrnscale = 2;
 
 typedef struct {
 	BOOL		enable;
@@ -82,9 +83,10 @@ BRESULT scrnmng_create(int width, int height) {
 		fprintf(stderr, "Error: SDL_Init: %s\n", SDL_GetError());
 		return(FAILURE);
 	}
-	s_sdlWindow = SDL_CreateWindow(app_name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, 0);
+	s_sdlWindow = SDL_CreateWindow(app_name, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * s_scrnscale, height * s_scrnscale, SDL_WINDOW_RESIZABLE);
 	s_renderer = SDL_CreateRenderer(s_sdlWindow, -1, 0);
 	SDL_RenderSetLogicalSize(s_renderer, width, height);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 	s_texture = SDL_CreateTexture(s_renderer, SDL_PIXELFORMAT_RGB565, SDL_TEXTUREACCESS_STATIC, width, height);
 	s_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 16, 0xf800, 0x07e0, 0x001f, 0);
 
@@ -133,6 +135,16 @@ BRESULT scrnmng_create(int width, int height) {
 void scrnmng_destroy(void) {
 
 	scrnmng.enable = FALSE;
+}
+
+void scrnmng_setscale(int scale) {
+
+	if (scale < 1) scale = 1;
+	if (scale > 4) scale = 4;
+	s_scrnscale = scale;
+	if (s_sdlWindow) {
+		SDL_SetWindowSize(s_sdlWindow, scrnmng.width * scale, scrnmng.height * scale);
+	}
 }
 
 RGB16 scrnmng_makepal16(RGB32 pal32) {

@@ -30,6 +30,9 @@ static const char str_30fps[] = "1/2 frame";
 static const char str_20fps[] = "1/3 frame";
 static const char str_15fps[] = "1/4 frame";
 static const char str_scropt[] = "Screen option...";
+static const char str_scrn1x[] = "Window 1x";
+static const char str_scrn2x[] = "Window 2x";
+static const char str_scrn3x[] = "Window 3x";
 
 static const char str_device[] = "Device";
 static const char str_keyboard[] = "Keyboard";
@@ -163,7 +166,9 @@ static const MSYSITEM s_hdd[] = {
 #endif
 
 static const MSYSITEM s_screen[] = {
-		{str_window,		NULL,		MID_WINDOW,			MENU_GRAY},
+		{str_scrn1x,		NULL,		MID_SCRN1X,			0},
+		{str_scrn2x,		NULL,		MID_SCRN2X,			0},
+		{str_scrn3x,		NULL,		MID_SCRN3X,			0},
 		{str_fullscrn,		NULL,		MID_FULLSCREEN,		MENU_GRAY},
 		{NULL,				NULL,		MID_STATIC,			MENU_SEPARATOR},
 		{str_normal,		NULL,		MID_ROLNORMAL,		MENU_GRAY},
