@@ -739,6 +739,10 @@ void atapi_dataread(IDEDRV drv) {
 }
 #endif
 
+void atapi_dataread_asyncwait(int wait) {
+	(void)wait;
+}
+
 void atapi_dataread_end(IDEDRV drv) {
 	SXSIDEV	sxsi;
 	sxsi = sxsi_getptr(drv->sxsidrv);

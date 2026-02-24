@@ -25,6 +25,7 @@ void fddmtr_reset(void);
 void fddmtrsnd_initialize(UINT rate);
 void fddmtrsnd_bind(void);
 void fddmtrsnd_deinitialize(void);
+void fddmtrsnd_play(UINT num, BOOL play);
 #else
 #define	fddmtrsnd_initialize(r)
 #define	fddmtrsnd_bind()

@@ -1,3 +1,5 @@
+#ifndef NP2_SDL2_COMMNG_H
+#define NP2_SDL2_COMMNG_H
 
 // ---- com manager interface
 
@@ -6,7 +8,10 @@ enum {
 	COMCREATE_PC9861K1,
 	COMCREATE_PC9861K2,
 	COMCREATE_PRINTER,
-	COMCREATE_MPU98II
+	COMCREATE_MPU98II,
+	COMCREATE_SMPU98_A,
+	COMCREATE_SMPU98_B,
+	COMCREATE_NULL			= 0xffff,
 };
 
 enum {
@@ -20,7 +25,14 @@ enum {
 	COMMSG_MIDIRESET		= 0,
 	COMMSG_SETFLAG,
 	COMMSG_GETFLAG,
-	COMMSG_USER
+	COMMSG_CHANGESPEED,
+	COMMSG_CHANGEMODE,
+	COMMSG_SETCOMMAND,
+	COMMSG_PURGE,
+	COMMSG_GETERROR,
+	COMMSG_CLRERROR,
+	COMMSG_REOPEN,
+	COMMSG_USER			    = 0x80,
 };
 
 struct _commng;
@@ -31,6 +43,10 @@ struct _commng {
 	UINT	connect;
 	UINT	(*read)(COMMNG self, UINT8 *data);
 	UINT	(*write)(COMMNG self, UINT8 data);
+	UINT	(*writeretry)(COMMNG self);
+	void	(*beginblocktranster)(COMMNG self);
+	void	(*endblocktranster)(COMMNG self);
+	UINT	(*lastwritesuccess)(COMMNG self);
 	UINT8	(*getstat)(COMMNG self);
 	INTPTR	(*msg)(COMMNG self, UINT msg, INTPTR param);
 	void	(*release)(COMMNG self);
@@ -48,7 +64,7 @@ typedef struct {
 extern "C" {
 #endif
 
-COMMNG commng_create(UINT device);
+COMMNG commng_create(UINT device, BOOL force);
 void commng_destroy(COMMNG hdl);
 
 #ifdef __cplusplus
@@ -60,3 +76,4 @@ void commng_destroy(COMMNG hdl);
 
 void commng_initialize(void);
 
+#endif /* NP2_SDL2_COMMNG_H */

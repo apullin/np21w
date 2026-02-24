@@ -595,3 +595,11 @@ int opna_sfload(POPNA opna, STFLAGH sfh, const SFENTRY *tbl)
 
 	return ret;
 }
+
+/* fmgen volume stubs (SDL2 doesn't use fmgen directly) */
+extern "C" {
+void opna_fmgen_setallvolumeFM_linear(int lvol) { (void)lvol; }
+void opna_fmgen_setallvolumePSG_linear(int lvol) { (void)lvol; }
+void opna_fmgen_setallvolumeADPCM_linear(int lvol) { (void)lvol; }
+void opna_fmgen_setallvolumeRhythmTotal_linear(int lvol) { (void)lvol; }
+}

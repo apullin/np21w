@@ -685,7 +685,11 @@ static void bios_itfcall(void) {
 	bios_reinitbyswitch();
 	bios0x18_0c();
 
+#if defined(_WIN32)
 	if (!np2cfg.ITF_WORK || GetKeyState(VK_PAUSE)<0) {
+#else
+	if (!np2cfg.ITF_WORK) {
+#endif
 		for (i=0; i<8; i++) {
 			mem[MEMX_MSW + (i*4)] = msw_default[i];
 		}

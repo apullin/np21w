@@ -1,3 +1,6 @@
+#ifndef NP2_SDL2_DOSIO_H
+#define NP2_SDL2_DOSIO_H
+
 
 typedef FILE *				FILEH;
 #define	FILEH_INVALID		NULL
@@ -69,6 +72,9 @@ short file_getdatetime(FILEH handle, DOSDATE *dosdate, DOSTIME *dostime);
 short file_delete(const char *path);
 short file_attr(const char *path);
 short file_dircreate(const char *path);
+short file_dirdelete(const char *path);
+short file_rename(const char *existpath, const char *newpath);
+short file_setattr(const char *path, short attr);
 
 /* カレントファイル操作 */
 void file_setcd(const char *exepath);
@@ -97,3 +103,4 @@ void file_setseparator(char *path, int maxlen);
 }
 #endif
 
+#endif /* NP2_SDL2_DOSIO_H */

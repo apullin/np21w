@@ -394,3 +394,10 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# macOS build artifacts
+build/
+np21w
+*.o
+*.d
+.DS_Store

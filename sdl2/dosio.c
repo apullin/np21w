@@ -1,6 +1,7 @@
 #include "compiler.h"
 #include <sys/stat.h>
 #include <time.h>
+#include <unistd.h>
 #if defined(WIN32) && defined(OSLANG_UTF8)
 #include "codecnv/codecnv.h"
 #endif
@@ -165,6 +166,19 @@ short file_dircreate(const char *path) {
 #endif
 }
 
+short file_dirdelete(const char *path) {
+	return((short)rmdir(path));
+}
+
+short file_rename(const char *existpath, const char *newpath) {
+	return((short)rename(existpath, newpath));
+}
+
+short file_setattr(const char *path, short attr) {
+	(void)path;
+	(void)attr;
+	return(0);
+}
 
 /* カレントファイル操作 */
 void file_setcd(const char *exepath) {

@@ -7,6 +7,7 @@
 #include	"pccore.h"
 #include	"iocore.h"
 #include	"diskimage/fddfile.h"
+#include	"fdd/fdd_mtr.h"
 #if defined(SUPPORT_SWSEEKSND)
 #include	"sound/pcmmix.h"
 #include	"fdd_mtr.res"

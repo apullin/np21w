@@ -7,6 +7,8 @@
 #include	"vramhdl.h"
 #include	"menubase.h"
 
+SCRNSTAT	scrnstat = {640, 400, 1, 8};
+
 static SDL_Window *s_sdlWindow;
 static SDL_Renderer *s_renderer;
 static SDL_Texture *s_texture;
@@ -21,15 +23,9 @@ typedef struct {
 	VRAMHDL		vram;
 } SCRNMNG;
 
-typedef struct {
-	int		width;
-	int		height;
-} SCRNSTAT;
-
 static const char app_name[] = "Neko Project II";
 
 static	SCRNMNG		scrnmng;
-static	SCRNSTAT	scrnstat;
 static	SCRNSURF	scrnsurf;
 
 typedef struct {

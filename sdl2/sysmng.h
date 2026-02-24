@@ -33,7 +33,16 @@ void sysmng_cpureset(void);
 #define	sysmng_fddaccess(a)
 #define	sysmng_hddaccess(a)
 
+
+enum {
+	SYS_UPDATECAPTION_FDD	= 0x01,
+	SYS_UPDATECAPTION_HDD	= 0x02,
+	SYS_UPDATECAPTION_MISC	= 0x04
+};
+
+#define sysmng_updatecaption(f)
+#define sysmng_requestupdatecaption(f)
+
 #ifdef __cplusplus
 }
 #endif
-

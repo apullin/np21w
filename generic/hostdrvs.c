@@ -14,7 +14,11 @@
 #include "pccore.h"
 #include "ini.h"
 
+#if defined(_WIN32)
+#if defined(_WIN32)
 #include <shlwapi.h>
+#endif
+#endif
 
  // 性能上最適化で優先しない方がいいコードなのでわざと別セグメントに置く
 //#pragma code_seg(".MISCCODE")
@@ -388,6 +392,7 @@ static BRESULT FindSinglePath(HDRVPATH *phdp, const char *lpFcbname)
 UINT hostdrvs_getrealdir(HDRVPATH *phdp, char *lpFcbname, const char *lpDosPath)
 {
 	phdp->file = s_hddroot;
+#if defined(_WIN32)
 	if(PathIsRelative(np2cfg.hdrvroot)){
 		TCHAR pathbuf[MAX_PATH+1];
 		TCHAR *pathtmp;
@@ -403,6 +408,7 @@ UINT hostdrvs_getrealdir(HDRVPATH *phdp, char *lpFcbname, const char *lpDosPath)
 	}else{
 		file_cpyname(phdp->szPath, np2cfg.hdrvroot, NELEMENTS(phdp->szPath));
 	}
+#endif
 
 	if (lpDosPath[0] == '\\')
 	{

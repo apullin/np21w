@@ -1,8 +1,13 @@
 #include "compiler.h"
 #include "soundmng.h"
+#include "sndcsec.h"
 #include <algorithm>
 #include "parts.h"
 #include "sound.h"
+
+#if defined(SOUND_CRITICAL) && defined(_SDL_mutex_h)
+SDL_mutex* g_sndcsec;
+#endif
 #if defined(VERMOUTH_LIB)
 #include "commng.h"
 #include "cmver.h"

@@ -1,4 +1,10 @@
 
+enum {
+	RGB24_B	= 0,
+	RGB24_G	= 1,
+	RGB24_R	= 2
+};
+
 typedef struct {
 	UINT8	*ptr;
 	int		xalign;
@@ -32,6 +38,15 @@ RGB16 scrnmng_makepal16(RGB32 pal32);
 }
 #endif
 
+
+typedef struct {
+	int		width;
+	int		height;
+	int		extend;
+	int		multiple;
+} SCRNSTAT;
+
+extern	SCRNSTAT	scrnstat;
 
 // ---- for SDL
 

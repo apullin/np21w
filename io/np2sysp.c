@@ -41,12 +41,20 @@
 #include	"dosio.h"
 #include	"mousemng.h"
 
+#if defined(_WIN32)
+#if defined(_WIN32)
 #include <shlwapi.h>
+#endif
+#endif
 
 extern int mouseif_absflag;
 
 // 性能上最適化で優先しない方がいいコードなのでわざと別セグメントに置く
+#if defined(_WIN32)
+#if defined(_WIN32)
 #pragma code_seg(".MISCCODE")
+#endif
+#endif
 
 #if 0
 #undef	TRACEOUT
@@ -922,5 +930,7 @@ void np2sysp_bind(void) {
 #endif
 }
 
+#if defined(_WIN32)
 #pragma code_seg()
+#endif
 
