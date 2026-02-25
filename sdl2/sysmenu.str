@@ -236,7 +236,7 @@ static const MSYSITEM s_device[] = {
 		{str_beep,			s_beep,		MID_STATIC,			0},
 		{str_soundboard,	s_snd,		MID_STATIC,			0},
 		{str_memory,		s_mem,		MID_STATIC,			0},
-		{str_mouse,			NULL,		MID_MOUSE,			MENU_GRAY},
+		{str_mouse,			NULL,		MID_MOUSE,			0},
 		{NULL,				NULL,		MID_STATIC,			MENU_SEPARATOR},
 		{str_seropt,		NULL,		MID_SERIAL1,		MENU_GRAY},
 		{NULL,				NULL,		MID_STATIC,			MENU_SEPARATOR},

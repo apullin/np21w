@@ -24,6 +24,7 @@
 #include	"dlgcfg.h"
 #include	"dlgscr.h"
 #include	"dlgabout.h"
+#include	"mousemng.h"
 
 
 static void sys_cmd(MENUID id) {
@@ -354,6 +355,10 @@ static void sys_cmd(MENUID id) {
 			np2cfg.EXTMEM = 7;
 			update |= SYS_UPDATECFG;
 			break;
+
+		case MID_MOUSE:
+			mousemng_setenabled(!mousemng_getenabled());
+			break;
 #if 0
 		case IDM_MOUSE:
 			mousemng_toggle(MOUSEPROC_SYSTEM);
@@ -533,6 +538,7 @@ BRESULT sysmenu_menuopen(UINT menutype, int x, int y) {
 	menusys_setcheck(MID_JOYX, (np2cfg.BTN_MODE & 1));
 	menusys_setcheck(MID_RAPID, (np2cfg.BTN_RAPID & 1));
 	menusys_setcheck(MID_MSRAPID, (np2cfg.MOUSERAPID & 1));
+	menusys_setcheck(MID_MOUSE, mousemng_getenabled());
 	return(menusys_open(x, y));
 }
 

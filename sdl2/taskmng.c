@@ -5,6 +5,7 @@
 #include	"vramhdl.h"
 #include	"menubase.h"
 #include	"sysmenu.h"
+#include	"mousemng.h"
 
 
 	BOOL	task_avail;
@@ -37,6 +38,7 @@ void taskmng_rol(void) {
 	switch(e.type) {
 		case SDL_MOUSEMOTION:
 			if (menuvram == NULL) {
+				mousemng_onmotion(e.motion.xrel, e.motion.yrel);
 			}
 			else {
 				menubase_moving(e.motion.x, e.motion.y, 0);
@@ -62,11 +64,14 @@ void taskmng_rol(void) {
 #endif
 					else
 					{
-						sysmenu_menuopen(0, e.button.x, e.button.y);
+						mousemng_onbutton(SDL_BUTTON_LEFT, 0);
 					}
 					break;
 
 				case SDL_BUTTON_RIGHT:
+					if (menuvram == NULL) {
+						mousemng_onbutton(SDL_BUTTON_RIGHT, 0);
+					}
 					break;
 			}
 			break;
@@ -78,23 +83,64 @@ void taskmng_rol(void) {
 					{
 						menubase_moving(e.button.x, e.button.y, 1);
 					}
+					else
+					{
+						/* Capture mouse on first click in emulation */
+						if (!mousemng_getcapture()) {
+							mousemng_setcapture(TRUE);
+						}
+						mousemng_onbutton(SDL_BUTTON_LEFT, 1);
+					}
 					break;
 
 				case SDL_BUTTON_RIGHT:
+					if (menuvram == NULL) {
+						mousemng_onbutton(SDL_BUTTON_RIGHT, 1);
+					}
+					break;
+
+				case SDL_BUTTON_MIDDLE:
+					/* Middle-click: toggle capture / menu (like Windows) */
+					if (menuvram != NULL) {
+						menubase_close();
+					}
+					else if (mousemng_getcapture()) {
+						mousemng_setcapture(FALSE);
+					}
+					else {
+						mousemng_setcapture(FALSE);
+						sysmenu_menuopen(0, 0, 0);
+					}
 					break;
 			}
 			break;
 
 		case SDL_KEYDOWN:
 			if (e.key.keysym.sym == SDLK_F11) {
+				/* F11: toggle menu (works if macOS isn't capturing it) */
 				if (menuvram == NULL) {
+					mousemng_setcapture(FALSE);
 					sysmenu_menuopen(0, 0, 0);
 				}
 				else {
 					menubase_close();
 				}
 			}
+			else if (e.key.keysym.sym == SDLK_ESCAPE
+				  && (e.key.keysym.mod & KMOD_GUI)) {
+				/* Cmd+Escape: release capture / toggle menu */
+				if (menuvram != NULL) {
+					menubase_close();
+				}
+				else if (mousemng_getcapture()) {
+					mousemng_setcapture(FALSE);
+				}
+				else {
+					sysmenu_menuopen(0, 0, 0);
+				}
+			}
 			else {
+				/* Everything else (including bare Escape) → PC-98 */
 				sdlkbd_keydown(e.key.keysym.sym);
 			}
 			break;
@@ -120,4 +166,3 @@ BOOL taskmng_sleep(UINT32 tick) {
 	}
 	return(task_avail);
 }
-

@@ -22,6 +22,7 @@
 #include	"vramhdl.h"
 #include	"menubase.h"
 #include	"sysmenu.h"
+#include	"mousemng.h"
 
 
 		NP2OSCFG	np2oscfg = {0, 0, 0, 0, 0};
@@ -150,6 +151,7 @@ int np2_main(int argc, char *argv[]) {
 	soundmng_initialize();
 	commng_initialize();
 	sysmng_initialize();
+	mousemng_initialize();
 	taskmng_initialize();
 	pccore_init();
 	S98_init();
