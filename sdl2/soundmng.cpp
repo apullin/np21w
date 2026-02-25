@@ -31,22 +31,20 @@ static	SOUNDMNG	soundmng;
 static void sound_play_cb(void *userdata, UINT8 *stream, int len) {
 
 	int			length;
-	SINT16		*dst;
 const SINT32	*src;
 
 	length = (std::min)(len, (int)(soundmng.samples * 2 * sizeof(SINT16)));
-	dst = soundmng.buf[soundmng.nsndbuf];
 	src = sound_pcmlock();
 	if (src) {
-		satuation_s16(dst, src, length);
+		satuation_s16((SINT16 *)stream, src, length);
 		sound_pcmunlock(src);
 	}
 	else {
-		ZeroMemory(dst, length);
+		SDL_memset(stream, 0, length);
 	}
-	SDL_memset(stream, 0, len);
-	SDL_MixAudio(stream, (UINT8 *)dst, length, SDL_MIX_MAXVOLUME);
-	soundmng.nsndbuf = (soundmng.nsndbuf + 1) % NSNDBUF;
+	if (len > length) {
+		SDL_memset(stream + length, 0, len - length);
+	}
 	(void)userdata;
 }
 
