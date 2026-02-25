@@ -86,6 +86,12 @@ static const SDLKCNV sdlcnv101[] =
 			/* = */
 			{SDLK_EQUALS,		0x0c},
 
+			/* US keyboard: ' key -> PC-98 colon (0x27) */
+			{SDLK_QUOTE,		0x27},
+
+			/* US keyboard: ` key -> PC-98 @ (0x1a) */
+			{SDLK_BACKQUOTE,	0x1a},
+
 			/* MacOS Yen */
 			{0xa5,				0x0d},
 };
