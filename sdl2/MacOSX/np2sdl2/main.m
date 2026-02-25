@@ -1,6 +1,6 @@
 /**
  * @file	main.m
- * @brief	ƒƒCƒ“
+ * @brief	ï¿½ï¿½ï¿½Cï¿½ï¿½
  */
 
 #include "compiler.h"
@@ -8,15 +8,24 @@
 #include "../../dosio.h"
 
 /**
- * ƒƒCƒ“
- * @param[in] argc ˆø”
- * @param[in] argv ˆø”
- * @return ƒŠƒUƒ‹ƒg ƒR[ƒh
+ * ï¿½ï¿½ï¿½Cï¿½ï¿½
+ * @param[in] argc ï¿½ï¿½ï¿½ï¿½
+ * @param[in] argv ï¿½ï¿½ï¿½ï¿½
+ * @return ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½g ï¿½Rï¿½[ï¿½h
  */
 int main(int argc, char * argv[])
 {
+	/* For a .app bundle, bundlePath is "/path/to/Foo.app" and file_setcd
+	   strips the last component to get "/path/to/" as the ROM search dir.
+	   For a raw binary, bundlePath is the directory (no trailing slash),
+	   so file_setcd would strip one level too many. Use argv[0] instead
+	   which is the actual binary path, giving us the correct directory. */
 	NSString *pstrBundlePath = [[NSBundle mainBundle] bundlePath];
-	file_setcd([pstrBundlePath UTF8String]);
+	if ([pstrBundlePath hasSuffix:@".app"]) {
+		file_setcd([pstrBundlePath UTF8String]);
+	} else {
+		file_setcd(argv[0]);
+	}
 
 	char** q = &argv[1];
 	for (int i = 1; i < argc; i++)

@@ -1,6 +1,6 @@
 /**
  * @file	usbdev.cpp
- * @brief	USB ƒAƒNƒZƒX ƒNƒ‰ƒX‚Ì“®ì‚Ì’è‹`‚ğs‚¢‚Ü‚·
+ * @brief	USB ï¿½Aï¿½Nï¿½Zï¿½X ï¿½Nï¿½ï¿½ï¿½Xï¿½Ì“ï¿½ï¿½ï¿½Ì’ï¿½`ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½Ü‚ï¿½
  */
 
 #include "compiler.h"
@@ -11,7 +11,7 @@
 #include <IOKit/usb/USBSpec.h>
 
 /**
- * ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+ * ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
  */
 CUsbDev::CUsbDev()
 	: m_device(NULL)
@@ -20,7 +20,7 @@ CUsbDev::CUsbDev()
 }
 
 /**
- * ƒfƒXƒgƒ‰ƒNƒ^
+ * ï¿½fï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
  */
 CUsbDev::~CUsbDev()
 {
@@ -28,16 +28,16 @@ CUsbDev::~CUsbDev()
 }
 
 /**
- * USB ƒI[ƒvƒ“
+ * USB ï¿½Iï¿½[ï¿½vï¿½ï¿½
  * @param[in] vid VID
  * @param[in] pid PID
- * @param[in] nIndex ƒCƒ“ƒfƒbƒNƒX
- * @retval true ¬Œ÷
- * @retval false ¸”s
+ * @param[in] nIndex ï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½X
+ * @retval true ï¿½ï¿½ï¿½ï¿½
+ * @retval false ï¿½ï¿½ï¿½s
  */
 bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 {
-	// ’T‚·ƒfƒoƒCƒX
+	// ï¿½Tï¿½ï¿½ï¿½fï¿½oï¿½Cï¿½X
 	const SInt32 usbVendor = vid;
 	const SInt32 usbProduct = pid;
 
@@ -50,7 +50,7 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 	CFMutableDictionaryRef matchingDict = IOServiceMatching(kIOUSBDeviceClassName);
 	if (matchingDict == NULL)
 	{
-		printf("Couldn't create a USB matching dictionary\n");
+		printf("[C86CTL-USB] Couldn't create a USB matching dictionary\n");
 		return false;
 	}
 
@@ -60,13 +60,13 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 	CFDictionarySetValue(matchingDict, CFSTR(kUSBVendorName), CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usbVendor));
 	CFDictionarySetValue(matchingDict, CFSTR(kUSBProductName), CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usbProduct));
 
-	// ƒCƒ“ƒ^ƒtƒFƒCƒX‚ğ“¾‚é
+	// ï¿½Cï¿½ï¿½ï¿½^ï¿½tï¿½Fï¿½Cï¿½Xï¿½ğ“¾‚ï¿½
 	io_iterator_t iterator = 0;
 	IOServiceGetMatchingServices(kIOMasterPortDefault, matchingDict, &iterator);
 	io_service_t usbDevice = IOIteratorNext(iterator);
 	if (usbDevice == 0)
 	{
-		printf("Device not found\n");
+		printf("[C86CTL-USB] Device not found\n");
 		return false;
 	}
 	IOObjectRelease(iterator);
@@ -78,7 +78,7 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 	kr = IOObjectRelease(usbDevice);
 	if ((kr != kIOReturnSuccess) || (plugInInterface == NULL))
 	{
-		printf("Unable to create a plug-in (%08x)\n", kr);
+		printf("[C86CTL-USB] Unable to create a plug-in (%08x)\n", kr);
 		return false;
 	}
 
@@ -88,7 +88,7 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 	(*plugInInterface)->Release(plugInInterface);
 	if ((result != S_OK) || (dev == NULL))
 	{
-		printf("Couldn't create a device interface (%08x)\n", (int)result);
+		printf("[C86CTL-USB] Couldn't create a device interface (%08x)\n", (int)result);
 		return false;
 	}
 
@@ -96,7 +96,7 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 	kr = (*dev)->USBDeviceOpen(dev);
 	if (kr != kIOReturnSuccess)
 	{
-		printf("Unable to open device: %08x\n", kr);
+		printf("[C86CTL-USB] Unable to open device: %08x\n", kr);
 		(*dev)->Release(dev);
 		return false;
 	}
@@ -105,7 +105,7 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 	kr = ConfigureDevice(dev);
 	if (kr != kIOReturnSuccess)
 	{
-		printf("Unable to configure device: %08x\n", kr);
+		printf("[C86CTL-USB] Unable to configure device: %08x\n", kr);
 		(*dev)->USBDeviceClose(dev);
 		(*dev)->Release(dev);
 		return false;
@@ -138,7 +138,7 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 		kr = IOObjectRelease(usbInterface);
 		if ((kr != kIOReturnSuccess) || (plugInInterface == NULL))
 		{
-			printf("Unable to create a plug-in (%08x)\n", kr);
+			printf("[C86CTL-USB] Unable to create a plug-in (%08x)\n", kr);
 			continue;
 		}
 
@@ -148,7 +148,7 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 		(*plugInInterface)->Release(plugInInterface);
 		if ((result != S_OK) || (interface == NULL))
 		{
-			printf("Couldn't create a device interface for the interface(%08x)\n", (int) result);
+			printf("[C86CTL-USB] Couldn't create a device interface for the interface (%08x)\n", (int) result);
 			continue;
 		}
 
@@ -159,14 +159,14 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 		UInt8 interfaceSubClass;
 		kr = (*interface)->GetInterfaceSubClass(interface, &interfaceSubClass);
 
-		printf("Interface class: %d, subclass: %d\n", interfaceClass, interfaceSubClass);
+		printf("[C86CTL-USB] Interface class: %d, subclass: %d\n", interfaceClass, interfaceSubClass);
 
 		// Now open the interface. This will cause the pipes associated with
 		// the endpoints in the interface descriptor to be instantiated
 		kr = (*interface)->USBInterfaceOpen(interface);
 		if (kr != kIOReturnSuccess)
 		{
-			printf("Unable to open interface (%08x)\n", kr);
+			printf("[C86CTL-USB] Unable to open interface (%08x)\n", kr);
 			(*interface)->Release(interface);
 			continue;
 		}
@@ -176,19 +176,19 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 		kr = (*interface)->GetNumEndpoints(interface, &interfaceNumEndpoints);
 		if (kr != kIOReturnSuccess)
 		{
-			printf("Unable to get number of endpoints (%08x)\n", kr);
+			printf("[C86CTL-USB] Unable to get number of endpoints (%08x)\n", kr);
 			(*interface)->USBInterfaceClose(interface);
 			(*interface)->Release(interface);
 			continue;
 		}
  
-		printf("Interface has %d endpoints\n", interfaceNumEndpoints);
+		printf("[C86CTL-USB] Interface has %d endpoints\n", interfaceNumEndpoints);
 		// Access each pipe in turn, starting with the pipe at index 1
 		// The pipe at index 0 is the default control pipe and should be
 		// accessed using (*usbDevice)->DeviceRequest() instead
 		for (int pipeRef = 1; pipeRef <= interfaceNumEndpoints; pipeRef++)
 		{
-			printf(" PipeRef %d: ", pipeRef);
+			printf("[C86CTL-USB]  PipeRef %d: ", pipeRef);
 
 			UInt8 direction;
 			UInt8 number;
@@ -198,7 +198,7 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 			kr = (*interface)->GetPipeProperties(interface, pipeRef, &direction, &number, &transferType, &maxPacketSize, &interval);
 			if (kr != kIOReturnSuccess)
 			{
-				printf("Unable to get properties of pipe(%08x)\n", kr);
+				printf("[C86CTL-USB] Unable to get properties of pipe(%08x)\n", kr);
 				continue;
 			}
 
@@ -225,7 +225,7 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 					message = "???";
 					break;
 			}
-			printf("direction %s, ", message);
+			printf("[C86CTL-USB]   direction %s, ", message);
 
 			switch (transferType)
 			{
@@ -269,7 +269,7 @@ bool CUsbDev::Open(unsigned int vid, unsigned int pid, unsigned int nIndex)
 }
 
 /**
- * ‚±‚ñ‚Ä‚¡‚®‚ 
+ * ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½
  * @param[in] dev Device interface
  * @return IOReturn
  */
@@ -290,7 +290,7 @@ IOReturn CUsbDev::ConfigureDevice(IOUSBDeviceInterface** dev)
 	kr = (*dev)->GetConfigurationDescriptorPtr(dev, 0, &configDesc);
 	if (kr != kIOReturnSuccess)
 	{
-		printf("Couldn't get configuration descriptor for index %d (err = %08x)\n", 0, kr);
+		printf("[C86CTL-USB] Couldn't get configuration descriptor for index %d (err = %08x)\n", 0, kr);
 		return kr;
 	}
 
@@ -299,14 +299,14 @@ IOReturn CUsbDev::ConfigureDevice(IOUSBDeviceInterface** dev)
 	kr = (*dev)->SetConfiguration(dev, configDesc->bConfigurationValue);
 	if (kr != kIOReturnSuccess)
 	{
-		printf("Couldn't set configuration to value %d (err = %08x)\n", 0, kr);
+		printf("[C86CTL-USB] Couldn't set configuration to value %d (err = %08x)\n", 0, kr);
 		return kr;
 	}
 	return kIOReturnSuccess;
 }
 
 /**
- * USB ƒNƒ[ƒY
+ * USB ï¿½Nï¿½ï¿½ï¿½[ï¿½Y
  */
 void CUsbDev::Close()
 {
@@ -326,14 +326,14 @@ void CUsbDev::Close()
 }
 
 /**
- * ƒRƒ“ƒgƒ[ƒ‹
- * @param[in] nType ƒ^ƒCƒv
- * @param[in] nRequest ƒŠƒNƒGƒXƒg
- * @param[in] nValue ’l
- * @param[in] nIndex ƒCƒ“ƒfƒbƒNƒX
- * @param[out] lpBuffer ƒoƒbƒtƒ@
- * @param[in] cbBuffer ƒoƒbƒtƒ@’·
- * @return ƒTƒCƒY
+ * ï¿½Rï¿½ï¿½ï¿½gï¿½ï¿½ï¿½[ï¿½ï¿½
+ * @param[in] nType ï¿½^ï¿½Cï¿½v
+ * @param[in] nRequest ï¿½ï¿½ï¿½Nï¿½Gï¿½Xï¿½g
+ * @param[in] nValue ï¿½l
+ * @param[in] nIndex ï¿½Cï¿½ï¿½ï¿½fï¿½bï¿½Nï¿½X
+ * @param[out] lpBuffer ï¿½oï¿½bï¿½tï¿½@
+ * @param[in] cbBuffer ï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½
+ * @return ï¿½Tï¿½Cï¿½Y
  */
 int CUsbDev::CtrlXfer(int nType, int nRequest, int nValue, int nIndex, void* lpBuffer, int cbBuffer)
 {
@@ -354,17 +354,17 @@ int CUsbDev::CtrlXfer(int nType, int nRequest, int nValue, int nIndex, void* lpB
 	IOReturn kr = (*m_interface)->ControlRequest(m_interface, 0, &req);
 	if (kr != kIOReturnSuccess)
 	{
-		::printf("Unable to perform control request (%08x)\n", kr);
+		::printf("[C86CTL-USB] Unable to perform control request (%08x)\n", kr);
 		return -1;
 	}
 	return static_cast<int>(req.wLenDone);
 }
 
 /**
- * ƒf[ƒ^‘—M
- * @param[in] lpBuffer ƒoƒbƒtƒ@
- * @param[in] cbBuffer ƒoƒbƒtƒ@’·
- * @return ƒTƒCƒY
+ * ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½M
+ * @param[in] lpBuffer ï¿½oï¿½bï¿½tï¿½@
+ * @param[in] cbBuffer ï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½
+ * @return ï¿½Tï¿½Cï¿½Y
  */
 int CUsbDev::WriteBulk(const void* lpBuffer, int cbBuffer)
 {
@@ -376,17 +376,17 @@ int CUsbDev::WriteBulk(const void* lpBuffer, int cbBuffer)
 	IOReturn kr = (*m_interface)->WritePipe(m_interface, 1, const_cast<void*>(lpBuffer), static_cast<UInt32>(cbBuffer));
 	if (kr != kIOReturnSuccess)
 	{
-		::printf("Unable to perform bulk write (%08x)\n", kr);
+		::printf("[C86CTL-USB] Unable to perform bulk write (%08x)\n", kr);
 		return -1;
 	}
 	return static_cast<int>(cbBuffer);
 }
 
 /**
- * ƒf[ƒ^óM
- * @param[out] lpBuffer ƒoƒbƒtƒ@
- * @param[in] cbBuffer ƒoƒbƒtƒ@’·
- * @return ƒTƒCƒY
+ * ï¿½fï¿½[ï¿½^ï¿½ï¿½M
+ * @param[out] lpBuffer ï¿½oï¿½bï¿½tï¿½@
+ * @param[in] cbBuffer ï¿½oï¿½bï¿½tï¿½@ï¿½ï¿½
+ * @return ï¿½Tï¿½Cï¿½Y
  */
 int CUsbDev::ReadBulk(void* lpBuffer, int cbBuffer)
 {
@@ -399,7 +399,7 @@ int CUsbDev::ReadBulk(void* lpBuffer, int cbBuffer)
 	IOReturn kr = (*m_interface)->ReadPipe(m_interface, 2, lpBuffer, &numBytesRead);
 	if (kr != kIOReturnSuccess)
 	{
-		::printf("Unable to perform bulk read (%08x)\n", kr);
+		::printf("[C86CTL-USB] Unable to perform bulk read (%08x)\n", kr);
 		return -1;
 	}
 	return static_cast<int>(numBytesRead);
