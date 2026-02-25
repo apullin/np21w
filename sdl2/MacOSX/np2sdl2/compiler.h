@@ -255,8 +255,17 @@ typedef	unsigned char	BOOL;
 #define	USE_SSE4_2
 #define	USE_SSE4A
 #define	USE_TSC
+#define	USE_VME
 #define	IA32_PAGING_EACHSIZE
 #define	IA32_REBOOT_ON_PANIC
+
+/* ---- CPU dispatch optimizations (match Windows np21w build) ---- */
+#define	USE_CPU_MODRMPREFETCH
+#define	USE_CPU_INLINEINST
+#define	USE_CPU_DIRECTREG
+#define	USE_CPU_EIPMASK
+#define	USE_FASTPAGING
+#define	BIOS_IO_EMULATION
 #define	SUPPORT_PC9821
 #define	SUPPORT_CRT15KHZ
 #define	SUPPORT_CRT31KHZ
