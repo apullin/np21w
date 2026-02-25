@@ -16,7 +16,7 @@
 
 typedef void (SOUNDCALL* CT1741FN)(DMA_INFO* ct, SINT32* pcm, UINT count);
 
- // ŠeÄ¶ƒ‚[ƒh‚ÌƒAƒ‰ƒCƒƒ“ƒg
+ // ï¿½eï¿½Äï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½ÌƒAï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½g
 int CT1741_BUF_ALIGN[] = {
 	1,		// 0: STOP
 	1,
@@ -37,28 +37,27 @@ int CT1741_BUF_ALIGN[] = {
 	1
 };
 
-// Ä¶—pî•ñ
+// ï¿½Äï¿½ï¿½pï¿½ï¿½ï¿½
 CT1741_PLAYINFO ct1741_playinfo = { 0 };
 
-// ƒGƒ~ƒ…ƒŒ[ƒ^‘¤‚ÌÄ¶ƒTƒ“ƒvƒŠƒ“ƒOƒŒ[ƒg
+// ï¿½Gï¿½~ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½^ï¿½ï¿½ï¿½ÌÄï¿½ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½[ï¿½g
 int ct1741_rate = 44100;
 
-// ƒTƒ“ƒvƒŠƒ“ƒOƒŒ[ƒg•ÏŠ·—p
+// ï¿½Tï¿½ï¿½ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½[ï¿½gï¿½ÏŠï¿½ï¿½p
 static double sample_rem = 0;
 
-// PIO 8bit ƒ‚ƒmƒ‰ƒ‹
+// PIO 8bit mono
 static void SOUNDCALL pcm8mPIO(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	UINT32	leng;
 	UINT32	samppos = 0;
 	UINT8* ptr1;
-	UINT8* ptr2;
 	SINT32	samp1;
-	SINT32	samp2;
 	int i;
 	int	samplen_dst = soundcfg.rate;
 	int	samplen_src = g_sb16.dsp_info.freq;
 	double sample_srclenf = sample_rem + (double)count * samplen_src / samplen_dst;
 	int sample_srclen = (int)sample_srclenf;
+	int frac = 0;
 	sample_rem = sample_srclenf - sample_srclen;
 
 	leng = ct1741_playinfo.pio.bufdatas;
@@ -67,18 +66,16 @@ static void SOUNDCALL pcm8mPIO(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	}
 
 	for (i = 0; i < count; i++) {
-		samppos = (i * samplen_src / samplen_dst);
 		if (samppos >= leng) {
 			break;
 		}
-		ptr1 = ct1741_playinfo.pio.buffer + ((ct1741_playinfo.pio.bufpos + samppos + 0) & CT1741_PIO_BUFMASK);
-		ptr2 = ct1741_playinfo.pio.buffer + ((ct1741_playinfo.pio.bufpos + samppos + 0) & CT1741_PIO_BUFMASK);
+		ptr1 = ct1741_playinfo.pio.buffer + ((ct1741_playinfo.pio.bufpos + samppos) & CT1741_PIO_BUFMASK);
 		samp1 = ((SINT32)ptr1[0] - 0x80) << 8;
-		samp2 = ((SINT32)ptr2[0] - 0x80) << 8;
-		//samp1 += ((samp2 - samp1) * fract) >> 12;
 		pcm[0] += (samp1 * ((int)np2cfg.vol_pcm * np2cfg.vol_master / 100) * (SINT32)g_sb16.mixregexp[MIXER_VOC_LEFT] / 255 * (SINT32)g_sb16.mixregexp[MIXER_MASTER_LEFT]) >> CT1741_WAVE_VOL_SHIFT;
 		pcm[1] += (samp1 * ((int)np2cfg.vol_pcm * np2cfg.vol_master / 100) * (SINT32)g_sb16.mixregexp[MIXER_VOC_RIGHT] / 255 * (SINT32)g_sb16.mixregexp[MIXER_MASTER_RIGHT]) >> CT1741_WAVE_VOL_SHIFT;
 		pcm += 2;
+		frac += samplen_src;
+		while (frac >= samplen_dst) { frac -= samplen_dst; samppos++; }
 	}
 
 	leng = min(leng, sample_srclen);
@@ -95,19 +92,18 @@ static void SOUNDCALL pcm8mPIO(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	}
 }
 
-// 8bit ƒ‚ƒmƒ‰ƒ‹
+// 8bit mono
 static void SOUNDCALL pcm8m(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	UINT32	leng;
 	UINT32	samppos = 0;
 	UINT8* ptr1;
-	UINT8* ptr2;
 	SINT32	samp1;
-	SINT32	samp2;
 	int i;
 	int	samplen_dst = soundcfg.rate;
 	int	samplen_src = g_sb16.dsp_info.freq;
 	double sample_srclenf = sample_rem + (double)count * samplen_src / samplen_dst;
 	int sample_srclen = (int)sample_srclenf;
+	int frac = 0;
 	sample_rem = sample_srclenf - sample_srclen;
 
 	leng = ct->bufdatas;
@@ -116,18 +112,16 @@ static void SOUNDCALL pcm8m(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	}
 
 	for (i = 0; i < count; i++) {
-		samppos = (i * samplen_src / samplen_dst);
 		if (samppos >= leng) {
 			break;
 		}
-		ptr1 = ct->buffer + ((ct->bufpos + samppos + 0) & CT1741_DMA_BUFMASK);
-		ptr2 = ct->buffer + ((ct->bufpos + samppos + 0) & CT1741_DMA_BUFMASK);
+		ptr1 = ct->buffer + ((ct->bufpos + samppos) & CT1741_DMA_BUFMASK);
 		samp1 = ((SINT32)ptr1[0] - 0x80) << 8;
-		samp2 = ((SINT32)ptr2[0] - 0x80) << 8;
-		//samp1 += ((samp2 - samp1) * fract) >> 12;
 		pcm[0] += (samp1 * ((int)np2cfg.vol_pcm * np2cfg.vol_master / 100) * (SINT32)g_sb16.mixregexp[MIXER_VOC_LEFT] / 255 * (SINT32)g_sb16.mixregexp[MIXER_MASTER_LEFT]) >> CT1741_WAVE_VOL_SHIFT;
 		pcm[1] += (samp1 * ((int)np2cfg.vol_pcm * np2cfg.vol_master / 100) * (SINT32)g_sb16.mixregexp[MIXER_VOC_RIGHT] / 255 * (SINT32)g_sb16.mixregexp[MIXER_MASTER_RIGHT]) >> CT1741_WAVE_VOL_SHIFT;
 		pcm += 2;
+		frac += samplen_src;
+		while (frac >= samplen_dst) { frac -= samplen_dst; samppos++; }
 	}
 
 	leng = min(leng, sample_srclen);
@@ -141,7 +135,7 @@ static void SOUNDCALL pcm8m(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	}
 }
 
-// 8bit ƒXƒeƒŒƒI
+// 8bit stereo
 static void SOUNDCALL pcm8s(DMA_INFO* ct, SINT32* pcm, UINT count) {
 
 	UINT32	leng;
@@ -155,6 +149,7 @@ static void SOUNDCALL pcm8s(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	int	samplen_src = g_sb16.dsp_info.freq;
 	double sample_srclenf = sample_rem + (double)2 * count * samplen_src / samplen_dst;
 	int sample_srclen = ((int)sample_srclenf) & ~0x1;
+	int frac = 0;
 	sample_rem = sample_srclenf - sample_srclen;
 
 	leng = ct->bufdatas;
@@ -163,7 +158,6 @@ static void SOUNDCALL pcm8s(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	}
 
 	for (i = 0; i < count; i++) {
-		samppos = 2 * (i * samplen_src / samplen_dst);
 		if (samppos >= leng) {
 			break;
 		}
@@ -171,10 +165,11 @@ static void SOUNDCALL pcm8s(DMA_INFO* ct, SINT32* pcm, UINT count) {
 		ptr2 = ct->buffer + ((ct->bufpos + samppos + 1) & CT1741_DMA_BUFMASK);
 		samp1 = ((SINT32)ptr1[0] - 0x80) << 8;
 		samp2 = ((SINT32)ptr2[0] - 0x80) << 8;
-		//samp1 += ((samp2 - samp1) * fract) >> 12;
 		pcm[0] += (samp1 * ((int)np2cfg.vol_pcm * np2cfg.vol_master / 100) * (SINT32)g_sb16.mixregexp[MIXER_VOC_LEFT] / 255 * (SINT32)g_sb16.mixregexp[MIXER_MASTER_LEFT]) >> CT1741_WAVE_VOL_SHIFT;
 		pcm[1] += (samp2 * ((int)np2cfg.vol_pcm * np2cfg.vol_master / 100) * (SINT32)g_sb16.mixregexp[MIXER_VOC_RIGHT] / 255 * (SINT32)g_sb16.mixregexp[MIXER_MASTER_RIGHT]) >> CT1741_WAVE_VOL_SHIFT;
 		pcm += 2;
+		frac += samplen_src;
+		while (frac >= samplen_dst) { frac -= samplen_dst; samppos += 2; }
 	}
 
 	leng = min(leng, sample_srclen);
@@ -189,20 +184,19 @@ static void SOUNDCALL pcm8s(DMA_INFO* ct, SINT32* pcm, UINT count) {
 }
 
 
-// 16bit ƒ‚ƒmƒ‰ƒ‹
+// 16bit mono
 static void SOUNDCALL Spcm16m(DMA_INFO* ct, SINT32* pcm, UINT count) {
 
 	UINT32	leng;
 	UINT32	samppos = 0;
 	UINT8* ptr1;
-	UINT8* ptr2;
 	SINT32	samp1;
-	SINT32	samp2;
 	int i;
 	int	samplen_dst = soundcfg.rate;
 	int	samplen_src = g_sb16.dsp_info.freq;
 	double sample_srclenf = sample_rem + (double)2 * count * samplen_src / samplen_dst;
 	int sample_srclen = ((int)sample_srclenf) & ~0x1;
+	int frac = 0;
 	sample_rem = sample_srclenf - sample_srclen;
 
 	leng = ct->bufdatas & ~0x1;
@@ -211,18 +205,16 @@ static void SOUNDCALL Spcm16m(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	}
 
 	for (i = 0; i < count; i++) {
-		samppos = 2 * (i * samplen_src / samplen_dst);
 		if (samppos >= leng) {
 			break;
 		}
-		ptr1 = (ct->buffer + ((ct->bufpos + samppos + 0) & CT1741_DMA_BUFMASK));
-		ptr2 = (ct->buffer + ((ct->bufpos + samppos + 0) & CT1741_DMA_BUFMASK));
+		ptr1 = (ct->buffer + ((ct->bufpos + samppos) & CT1741_DMA_BUFMASK));
 		samp1 = ((SINT32)((SINT8)ptr1[1]) << 8) + ptr1[0];
-		samp2 = ((SINT32)((SINT8)ptr2[1]) << 8) + ptr2[0];
-		//samp1 += ((samp2 - samp1) * fract) >> 12;
 		pcm[0] += (samp1 * ((int)np2cfg.vol_pcm * np2cfg.vol_master / 100) * (SINT32)g_sb16.mixregexp[MIXER_VOC_LEFT] / 255 * (SINT32)g_sb16.mixregexp[MIXER_MASTER_LEFT]) >> CT1741_WAVE_VOL_SHIFT;
 		pcm[1] += (samp1 * ((int)np2cfg.vol_pcm * np2cfg.vol_master / 100) * (SINT32)g_sb16.mixregexp[MIXER_VOC_RIGHT] / 255 * (SINT32)g_sb16.mixregexp[MIXER_MASTER_RIGHT]) >> CT1741_WAVE_VOL_SHIFT;
 		pcm += 2;
+		frac += samplen_src;
+		while (frac >= samplen_dst) { frac -= samplen_dst; samppos += 2; }
 	}
 
 	leng = min(leng, sample_srclen);
@@ -236,7 +228,7 @@ static void SOUNDCALL Spcm16m(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	}
 }
 
-// 16bit ƒXƒeƒŒƒI(little endian)
+// 16bit stereo (little endian)
 static void SOUNDCALL Spcm16s(DMA_INFO* ct, SINT32* pcm, UINT count) {
 
 	UINT32	leng;
@@ -250,6 +242,7 @@ static void SOUNDCALL Spcm16s(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	int	samplen_src = g_sb16.dsp_info.freq;
 	double sample_srclenf = sample_rem + (double)4 * count * samplen_src / samplen_dst;
 	int sample_srclen = ((int)sample_srclenf) & ~0x3;
+	int frac = 0;
 	sample_rem = sample_srclenf - sample_srclen;
 
 	leng = ct->bufdatas & ~0x3;
@@ -258,7 +251,6 @@ static void SOUNDCALL Spcm16s(DMA_INFO* ct, SINT32* pcm, UINT count) {
 	}
 
 	for (i = 0; i < count; i++) {
-		samppos = 4 * (i * samplen_src / samplen_dst);
 		if (samppos >= leng) {
 			break;
 		}
@@ -266,10 +258,11 @@ static void SOUNDCALL Spcm16s(DMA_INFO* ct, SINT32* pcm, UINT count) {
 		ptr2 = (ct->buffer + ((ct->bufpos + samppos + 2) & CT1741_DMA_BUFMASK));
 		samp1 = ((SINT32)((SINT8)ptr1[1]) << 8) + ptr1[0];
 		samp2 = ((SINT32)((SINT8)ptr2[1]) << 8) + ptr2[0];
-		//samp1 += ((samp2 - samp1) * fract) >> 12;
 		pcm[0] += (samp1 * ((int)np2cfg.vol_pcm * np2cfg.vol_master / 100) * (SINT32)g_sb16.mixregexp[MIXER_VOC_LEFT] / 255 * (SINT32)g_sb16.mixregexp[MIXER_MASTER_LEFT]) >> CT1741_WAVE_VOL_SHIFT;
 		pcm[1] += (samp2 * ((int)np2cfg.vol_pcm * np2cfg.vol_master / 100) * (SINT32)g_sb16.mixregexp[MIXER_VOC_RIGHT] / 255 * (SINT32)g_sb16.mixregexp[MIXER_MASTER_RIGHT]) >> CT1741_WAVE_VOL_SHIFT;
 		pcm += 2;
+		frac += samplen_src;
+		while (frac >= samplen_dst) { frac -= samplen_dst; samppos += 4; }
 	}
 
 	leng = min(leng, sample_srclen);
@@ -312,9 +305,9 @@ static const CT1741FN ct1741fn[16] = {
 };
 
 void SOUNDCALL ct1741_getpcm(DMA_INFO* ct, SINT32* pcm, UINT count) {
-	static CT1741FN lastplayfn = nomake; // ÅŒã‚Ég—p‚µ‚½Ä¶—pŠÖ”
+	static CT1741FN lastplayfn = nomake; // ï¿½ÅŒï¿½Égï¿½pï¿½ï¿½ï¿½ï¿½ï¿½Äï¿½ï¿½pï¿½Öï¿½
 
-	// Ä¶—pƒoƒbƒtƒ@‚É‘—‚é
+	// ï¿½Äï¿½ï¿½pï¿½oï¿½bï¿½tï¿½@ï¿½É‘ï¿½ï¿½ï¿½
 	if (ct1741_playinfo.playwaitcounter <= 0) {
 		int idx = g_sb16.dsp_info.dma.mode | g_sb16.dsp_info.dma.stereo << 3;
 #if defined(SUPPORT_MULTITHREAD)
@@ -329,7 +322,7 @@ void SOUNDCALL ct1741_getpcm(DMA_INFO* ct, SINT32* pcm, UINT count) {
 		{
 			if (g_sb16.dsp_info.dma.mode == CT1741_DMAMODE_NONE && ct1741_playinfo.bufdatasrem < CT1741_BUF_ALIGN[idx])
 			{
-				ct->bufdatas = 0; // ‘S•”Ì‚Ä‚é
+				ct->bufdatas = 0; // ï¿½Sï¿½ï¿½ï¿½Ì‚Ä‚ï¿½
 				sample_rem = 0;
 			}
 			if (idx != 0)
