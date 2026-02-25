@@ -444,9 +444,13 @@ OBJC_OBJS = $(ALL_OBJC_SRCS:%.m=$(BUILDDIR)/%.o)
 ALL_OBJS = $(C_OBJS) $(CXX_OBJS) $(OBJC_OBJS)
 
 # ---- rules ----
-.PHONY: all clean
+.PHONY: all clean test
 
 all: $(TARGET)
+
+test: tests/audio_test.c
+	$(CC) -O2 -o audio_test $<
+	./audio_test
 
 $(TARGET): $(ALL_OBJS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
